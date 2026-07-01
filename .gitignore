@@ -1,0 +1,18 @@
+# Compiled binaries
+/voltkv
+/voltkv.exe
+/bin/
+*.exe
+
+# AOF persistence files
+*.aof
+*.aof.rewrite
+
+# Test / build artifacts
+*.out
+*.test
+
+# Editor / OS cruft
+.DS_Store
+.idea/
+.vscode/
