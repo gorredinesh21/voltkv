@@ -1,0 +1,10 @@
+# voltkv HTTP demo — Cloud Run variant (builds cmd/httpdemo instead of the TCP server).
+FROM golang:1.23-alpine AS build
+WORKDIR /src
+COPY go.mod ./
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /out/httpdemo ./cmd/httpdemo
+FROM alpine:3.20
+COPY --from=build /out/httpdemo /httpdemo
+ENV PORT=8080
+ENTRYPOINT ["/httpdemo"]
