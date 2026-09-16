@@ -34,7 +34,7 @@ func main() {
 	// In-process real server (TTL sweeper on, no persistence).
 	go func() {
 		srv := server.New(server.Config{Addr: respAddr, Shards: 16, SweepEvery: time.Second})
-		if err := srv.ListenAndServe(); err != nil {
+		if err := srv.Run(context.Background()); err != nil {
 			fmt.Println("resp server:", err)
 			os.Exit(1)
 		}
