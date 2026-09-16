@@ -8,7 +8,7 @@ COPY go.mod ./
 COPY . .
 # CGO_ENABLED=0 => statically linked; -ldflags "-s -w" strips debug info to
 # shrink the binary. Output lands at /out/voltkv.
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-s -w" -o /out/voltkv ./cmd/server
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-s -w" -o /out/voltkv ./cmd/httpdemo
 
 # ---- run stage: tiny scratch image with just the static binary ----
 FROM scratch
