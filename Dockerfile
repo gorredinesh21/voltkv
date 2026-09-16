@@ -15,4 +15,5 @@ FROM scratch
 COPY --from=build /out/voltkv /voltkv
 EXPOSE 6380
 # AOF disabled by default; mount a volume and pass -aof /data/voltkv.aof to enable.
-ENTRYPOINT ["/voltkv", "-addr", ":6380"]
+ENV PORT=8080
+ENTRYPOINT ["/voltkv"]
