@@ -178,16 +178,39 @@ func handleInfo(w http.ResponseWriter, r *http.Request) {
 
 func handleHome(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	fmt.Fprint(w, `<!doctype html><html><head><meta charset=utf-8><title>voltkv</title>
-<style>body{font-family:system-ui;background:#0f1117;color:#e8eaf0;max-width:680px;margin:40px auto;padding:0 16px}a{color:#4f8cff}pre{background:#171a23;padding:12px;border-radius:8px;overflow:auto}</style></head><body>
-<h1>voltkv <span style="color:#9aa3b5;font-weight:400">— Redis-compatible store in Go</span></h1>
-<p>Speaks the real <b>RESP2</b> wire protocol (redis-cli compatible). This page runs the TCP server in-process on a loopback port and translates HTTP requests into actual RESP client sessions.</p>
-<p>Try it:</p>
-<pre>curl 'HOST/set?key=greeting&amp;value=hello'
-curl 'HOST/get?key=greeting'
-curl 'HOST/info'</pre>
-<p><a href="https://github.com/gorredinesh21/voltkv">Source &amp; benchmarks (6.3x sharded scaling)</a></p>
-</body></html>`)
+	fmt.Fprint(w, `<!doctype html><html><head><meta charset=utf-8><title>voltkv — try it live</title>
+<style>
+body{font-family:system-ui;background:#0f1117;color:#e8eaf0;max-width:680px;margin:40px auto;padding:0 16px}
+input{background:#171a23;color:#e8eaf0;border:1px solid #2a2f3d;border-radius:8px;padding:10px 14px;font-size:14px;outline:none}
+input:focus{border-color:#4f8cff}
+button{background:#4f8cff;color:#fff;border:0;border-radius:8px;padding:10px 20px;font-size:14px;cursor:pointer}
+button:disabled{opacity:.4}
+.result{background:#171a23;padding:12px 16px;border-radius:8px;margin-top:10px;font-family:monospace;font-size:13px;white-space:pre-wrap;min-height:2em}
+label{color:#9aa3b5;font-size:12px;margin-bottom:4px;display:block}
+.row{display:flex;gap:8px;margin-bottom:12px;align-items:flex-end}
+.half{flex:1}
+a{color:#4f8cff}
+h1 span{color:#9aa3b5;font-weight:400;font-size:18px}
+.note{color:#9aa3b5;font-size:12px;margin-top:6px}
+</style></head><body>
+<h1>voltkv <span>— Redis-compatible store in Go</span></h1>
+<p style="color:#9aa3b5">This page runs the real TCP server in-process. Each button below sends an actual RESP client command. Try storing and retrieving values.</p>
+<div class="row"><div class="half"><label>Key</label><input id="key" placeholder="mykey" style="width:100%"></div>
+<div class="half"><label>Value</label><input id="value" placeholder="hello world" style="width:100%"></div></div>
+<div class="row"><button onclick="doSet()" id="btnSet">SET key = value</button><button onclick="doGet()" id="btnGet">GET key</button><button onclick="doInfo()">Server INFO</button></div>
+<div class="result" id="result">— click a button above —</div>
+<p class="note">Also works via curl: <code>curl 'HOST/set?key=greeting&value=hello'</code> · <a href="https://github.com/gorredinesh21/voltkv">Source &amp; benchmarks</a></p>
+<script>
+async function call(path){const r=await fetch(path);return r.json()}
+async function doSet(){const k=document.getElementById('key').value||'mykey';const v=document.getElementById('value').value||'hello';
+document.getElementById('result').textContent='Setting...';const d=await call('/set?key='+encodeURIComponent(k)+'&value='+encodeURIComponent(v));
+document.getElementById('result').textContent='SET → '+JSON.stringify(d)}
+async function doGet(){const k=document.getElementById('key').value||'mykey';
+document.getElementById('result').textContent='Getting...';const d=await call('/get?key='+encodeURIComponent(k));
+document.getElementById('result').textContent='GET → '+JSON.stringify(d,null,2)}
+async function doInfo(){document.getElementById('result').textContent='Loading...';
+const r=await fetch('/info');document.getElementById('result').textContent=await r.text()}
+</script></body></html>`)
 }
 
 func writeJSONorErr(w http.ResponseWriter, reply string, err error) {
